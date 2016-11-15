@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 				printf("Humidity : %f\n",s->getHumidity());
 				printf("Channel : %d\n",s->getChannel());
                                 if((loggingok) && (s->getChannel()>0)) {
-                                        fprintf(fp,"%d,temp%f,hum%f\n",s->getChannel(),s->getTemperature(),s->getHumidity());
+                                        fprintf(fp,"%s,%d,%f,%f\n",message,s->getChannel(),s->getTemperature(),s->getHumidity());
                                         fflush(fp);
                                         fflush(stdout);
                                 }

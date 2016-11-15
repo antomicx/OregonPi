@@ -1,4 +1,4 @@
-CXXFLAGS += -O2 -Wall -g -pthread
+CXXFLAGS += -O2 -Wall -g -lpthread -pthread -static
 
 all: test
 
