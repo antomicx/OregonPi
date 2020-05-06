@@ -115,6 +115,7 @@ class OregonSensorV2 : public Sensor {
  private:
   bool decode( char * _str ); // wrapper to right decode method
 
+  bool decode_BTGHN129(char *pt); // decode sensor information
   bool decode_BTHG968(char *pt); // decode sensor information
   bool decode_RGR918(char *pt); // decode sensor information
   bool decode_THGR122NX(char * pt); // decode sensor informations

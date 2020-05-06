@@ -307,7 +307,12 @@ case 0x2D10:
 _sensorType=0x2D10;
  _sensorName = "RGR918";
 return decode_RGR918(pt); break;
- 
+
+case 0x5D53:
+_sensorType=0x5D53;
+ _sensorName = "BTHGN129";
+return decode_BTGHN129(pt); break;
+
 default:
   std::cout << "Unknown sensor id: " << std::hex << isensorId << std::endl;
   return false;
@@ -320,6 +325,54 @@ default:
  }
  return false;
 }
+
+
+// —————————————————————————————
+// Decode OregonScientific V2 protocol for specific
+// Oregon Devices
+// – BTGHN129 temperature + pression atmospherique
+// ——————————————————————————————
+bool OregonSensorV2::decode_BTGHN129(char * pt) {
+
+	char channel; int ichannel; // values 1,2,4
+	char temp[4]; double dtemp; // Temp in BCD
+	char tempS; int itempS; // Sign 0 = positif
+	char humid[4]; double dhumid; // Humid in BCD
+	char crc[3]; int icrc;
+	int len = strlen(pt);
+
+	if ( len == 20 ) {
+
+		channel = pt[4];
+		temp[0] = pt[10] ; temp[1] = pt[11] ; temp[2] = pt[8] ; temp[3] ='\0';
+		tempS = pt[13];
+		humid[0] = pt[15] ; humid[1] = pt[12]; humid[2] = '0' ; humid[3] ='\0';
+		crc[0] = pt[18] ; crc[1] = pt[19] ; crc[2] ='\0';
+
+#ifdef SENSORDEBUG
+		printf("OSV2 – decode : id(%s) ch(%d) temp(%s) sign(%c) humid(%s) crc(%s)\n", "5D53", channel, temp,tempS,humid, crc);
+#endif
+
+		// Conversion to int value
+		ichannel = getIntFromChar(channel);
+		itempS = getIntFromChar(tempS) & 0x08;
+		icrc = getIntFromString(crc);
+		dtemp = getDoubleFromString(temp);
+		dhumid = getDoubleFromString(humid);
+
+#ifdef SENSORDEBUG
+		printf("OSV2 – decode : id(0x%04X) ch(%d) temp(%f) sign(%d) humid(%f) crc(0x%02X)\n",0x5d53,ichannel,dtemp,itempS,dhumid, icrc);
+#endif
+		_availableInfos.setFlags(haveChannel);
+		_channel = (ichannel != 4)?ichannel:3;
+		_availableInfos.setFlags(haveTemperature);
+		_temperature = (itempS == 0)?dtemp:-dtemp;
+		_availableInfos.setFlags(haveHumidity);
+		_humidity = dhumid;
+	}
+	return false;
+}
+
 
 // —————————————————————————————
 // Decode OregonScientific V2 protocol for specific
